@@ -451,7 +451,8 @@ export class ColmiRingService {
    */
   async requestSteps(): Promise<void> {
     if (!this.isConnected()) {
-      throw new Error('Ring is not connected');
+      console.warn('Cannot request steps: Ring is not connected');
+      return; // Fail silently to avoid crashing the UI
     }
 
     try {
@@ -459,7 +460,9 @@ export class ColmiRingService {
       await this.sendCommand(stepsPacket, 'steps request');
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      throw new Error(`Failed to request steps: ${errorMessage}`);
+      // Log error but don't throw - this prevents UI crashes from transient connection issues
+      console.warn(`Failed to request steps: ${errorMessage}`);
+      // Connection might be weak or temporarily lost, will retry on next poll
     }
   }
 

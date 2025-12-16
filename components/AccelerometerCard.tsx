@@ -222,6 +222,101 @@ export function AccelerometerCard({
         )}
       </div>
 
+      {/* Hand Position Visual Guide */}
+      {realAccelerometerData && (
+        <div className="mb-6 p-4 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg border-2 border-purple-200 dark:border-purple-700">
+          <div className="text-center mb-4">
+            <h4 className="text-lg font-bold text-purple-900 dark:text-purple-100 mb-1">
+              👋 Your Current Hand Position
+            </h4>
+            <p className="text-xs text-purple-600 dark:text-purple-300">
+              Live tilt angles • {new Date(realAccelerometerData.timestamp).toLocaleTimeString()}
+            </p>
+          </div>
+          
+          {/* Visual Hand Representation */}
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            {/* Forward/Backward Tilt */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-red-200 dark:border-red-700">
+              <div className="text-center">
+                <div className="text-3xl mb-2">
+                  {toDegrees(realAccelerometerData.rotateX - calibrationOffset.x) > 15 ? '☝️' : 
+                   toDegrees(realAccelerometerData.rotateX - calibrationOffset.x) < -15 ? '👇' : '✋'}
+                </div>
+                <div className="text-xs font-semibold text-red-700 dark:text-red-300 mb-1">
+                  PITCH (Forward/Back)
+                </div>
+                <div className="text-2xl font-bold text-red-600 dark:text-red-400">
+                  {toDegrees(realAccelerometerData.rotateX - calibrationOffset.x).toFixed(0)}°
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  {toDegrees(realAccelerometerData.rotateX - calibrationOffset.x) > 15 ? 'Pointing Up' :
+                   toDegrees(realAccelerometerData.rotateX - calibrationOffset.x) < -15 ? 'Pointing Down' : 'Level'}
+                </div>
+              </div>
+            </div>
+
+            {/* Left/Right Tilt */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-green-200 dark:border-green-700">
+              <div className="text-center">
+                <div className="text-3xl mb-2">
+                  {toDegrees(realAccelerometerData.rotateY - calibrationOffset.y) > 15 ? '👉' : 
+                   toDegrees(realAccelerometerData.rotateY - calibrationOffset.y) < -15 ? '👈' : '✋'}
+                </div>
+                <div className="text-xs font-semibold text-green-700 dark:text-green-300 mb-1">
+                  ROLL (Left/Right)
+                </div>
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">
+                  {toDegrees(realAccelerometerData.rotateY - calibrationOffset.y).toFixed(0)}°
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  {toDegrees(realAccelerometerData.rotateY - calibrationOffset.y) > 15 ? 'Tilted Right' :
+                   toDegrees(realAccelerometerData.rotateY - calibrationOffset.y) < -15 ? 'Tilted Left' : 'Level'}
+                </div>
+              </div>
+            </div>
+
+            {/* Twist/Rotation */}
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-blue-200 dark:border-blue-700">
+              <div className="text-center">
+                <div className="text-3xl mb-2">
+                  {toDegrees(realAccelerometerData.rotateZ - calibrationOffset.z) > 15 ? '🔄' : 
+                   toDegrees(realAccelerometerData.rotateZ - calibrationOffset.z) < -15 ? '🔃' : '✋'}
+                </div>
+                <div className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-1">
+                  YAW (Twist)
+                </div>
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  {toDegrees(realAccelerometerData.rotateZ - calibrationOffset.z).toFixed(0)}°
+                </div>
+                <div className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                  {toDegrees(realAccelerometerData.rotateZ - calibrationOffset.z) > 15 ? 'Clockwise' :
+                   toDegrees(realAccelerometerData.rotateZ - calibrationOffset.z) < -15 ? 'Counter-CW' : 'Neutral'}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Reference Guide */}
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+            <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
+              📖 Quick Guide:
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-xs text-gray-600 dark:text-gray-400">
+              <div>
+                <span className="font-semibold text-red-600">Pitch:</span> Fingertip up/down
+              </div>
+              <div>
+                <span className="font-semibold text-green-600">Roll:</span> Hand left/right
+              </div>
+              <div>
+                <span className="font-semibold text-blue-600">Yaw:</span> Wrist twist
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Current Orientation & Movement */}
       {realAccelerometerData && (
         <div className="mb-6 space-y-4">

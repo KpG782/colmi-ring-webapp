@@ -14,13 +14,14 @@ import { ActivityCard } from './ActivityCard';
 import { DailyStepsCard } from './DailyStepsCard';
 import { LiveStepsCard } from './LiveStepsCard';
 import { AccelerometerCard } from './AccelerometerCard';
+import { GestureTrainer } from './GestureTrainer';
 import { SpO2Card } from './SpO2Card';
 import { StatusFooter } from './StatusFooter';
 import { DebugInfo } from './DebugInfo';
 import { Tabs } from './Tabs';
 
 type ConnectionState = 'connected' | 'disconnected' | 'reconnecting' | 'low-power' | 'out-of-range';
-type TabId = 'overview' | 'health' | 'activity' | 'sensors' | 'settings';
+type TabId = 'overview' | 'health' | 'activity' | 'sensors' | 'gestures' | 'settings';
 
 /**
  * DataDashboard Component
@@ -514,6 +515,7 @@ export function DataDashboard({ ringService }: DataDashboardProps) {
             { id: 'health', label: 'Health Metrics', icon: <Heart /> },
             { id: 'activity', label: 'Activity', icon: <TrendingUp /> },
             { id: 'sensors', label: 'Sensors', icon: <Zap /> },
+            { id: 'gestures', label: 'Gesture Training', icon: <span className="text-xl">🤚</span> },
             { id: 'settings', label: 'Advanced', icon: <Settings /> },
           ]}
           activeTab={activeTab}
@@ -650,6 +652,19 @@ export function DataDashboard({ ringService }: DataDashboardProps) {
               battery={ringData.battery}
               onCalibrate={handleCalibration}
               spO2={ringData.spO2}
+            />
+          </div>
+        )}
+
+        {/* Gestures Tab */}
+        {activeTab === 'gestures' && (
+          <div className="space-y-6 tab-content">
+            <GestureTrainer
+              isConnected={isConnected}
+              isRawDataMode={isRawDataMode}
+              accelerometerData={accelerometerData}
+              onStartRawData={handleStartRawData}
+              onStopRawData={handleStopRawData}
             />
           </div>
         )}

@@ -218,7 +218,7 @@ export function LiveStepsCard({
 
               return (
                 <div
-                  key={update.timestamp.getTime()}
+                  key={`${update.timestamp.getTime()}-${index}`}
                   className={`flex-1 rounded-sm transition-all duration-300 ${
                     update.delta > 0
                       ? isRecent ? 'bg-green-500' : 'bg-blue-400'

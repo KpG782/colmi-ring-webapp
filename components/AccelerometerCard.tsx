@@ -16,16 +16,16 @@ interface AccelerometerCardProps {
 
 /**
  * AccelerometerCard Component
- * 
+ *
  * Shows raw accelerometer data from Colmi ring with 3D orientation.
  * Based on @atc1441's MIDI Ring implementation for raw data parsing.
  */
-export function AccelerometerCard({ 
-  isConnected, 
+export function AccelerometerCard({
+  isConnected,
   isRawDataMode = false,
   accelerometerData: realAccelerometerData,
-  onStartRawData, 
-  onStopRawData 
+  onStartRawData,
+  onStopRawData
 }: AccelerometerCardProps) {
   const [dataHistory, setDataHistory] = useState<AccelerometerData[]>([]);
   const [isCalibrating, setIsCalibrating] = useState<boolean>(false);
@@ -43,7 +43,7 @@ export function AccelerometerCard({
         rotateY: realAccelerometerData.rotateY - calibrationOffset.y,
         rotateZ: realAccelerometerData.rotateZ - calibrationOffset.z,
       };
-      
+
       setDataHistory(prev => [...prev.slice(-19), calibratedData]); // Keep last 20 readings
     }
   }, [realAccelerometerData, isRawDataMode, calibrationOffset]);
@@ -76,66 +76,66 @@ export function AccelerometerCard({
   // Get detailed orientation description with real-world context
   const getOrientationDescription = (): { description: string; details: string; emoji: string } => {
     if (!realAccelerometerData) return { description: 'No data', details: '', emoji: '❓' };
-    
+
     const { rotateX, rotateY, rotateZ } = realAccelerometerData;
     const xDeg = toDegrees(rotateX - calibrationOffset.x);
     const yDeg = toDegrees(rotateY - calibrationOffset.y);
     const zDeg = toDegrees(rotateZ - calibrationOffset.z);
-    
+
     const absX = Math.abs(xDeg);
     const absY = Math.abs(yDeg);
     const absZ = Math.abs(zDeg);
-    
+
     // Determine primary orientation
     if (absX < 15 && absY < 15 && absZ < 15) {
-      return { 
-        description: 'Ring is level/flat', 
-        details: 'Ring face is parallel to ground', 
-        emoji: '📱' 
+      return {
+        description: 'Ring is level/flat',
+        details: 'Ring face is parallel to ground',
+        emoji: '📱'
       };
     }
-    
+
     if (absX > 60) {
       const direction = xDeg > 0 ? 'forward' : 'backward';
-      return { 
-        description: `Ring tilted ${direction}`, 
-        details: `X-axis rotation: ${xDeg.toFixed(1)}° (hand pitch)`, 
-        emoji: xDeg > 0 ? '⬆️' : '⬇️' 
+      return {
+        description: `Ring tilted ${direction}`,
+        details: `X-axis rotation: ${xDeg.toFixed(1)}° (hand pitch)`,
+        emoji: xDeg > 0 ? '⬆️' : '⬇️'
       };
     }
-    
+
     if (absY > 60) {
       const direction = yDeg > 0 ? 'right' : 'left';
-      return { 
-        description: `Ring tilted ${direction}`, 
-        details: `Y-axis rotation: ${yDeg.toFixed(1)}° (hand roll)`, 
-        emoji: yDeg > 0 ? '➡️' : '⬅️' 
+      return {
+        description: `Ring tilted ${direction}`,
+        details: `Y-axis rotation: ${yDeg.toFixed(1)}° (hand roll)`,
+        emoji: yDeg > 0 ? '➡️' : '⬅️'
       };
     }
-    
+
     if (absZ > 60) {
       const direction = zDeg > 0 ? 'clockwise' : 'counter-clockwise';
-      return { 
-        description: `Ring rotated ${direction}`, 
-        details: `Z-axis rotation: ${zDeg.toFixed(1)}° (hand twist)`, 
-        emoji: zDeg > 0 ? '🔄' : '🔃' 
+      return {
+        description: `Ring rotated ${direction}`,
+        details: `Z-axis rotation: ${zDeg.toFixed(1)}° (hand twist)`,
+        emoji: zDeg > 0 ? '🔄' : '🔃'
       };
     }
-    
-    return { 
-      description: 'Ring is slightly tilted', 
-      details: `X: ${xDeg.toFixed(1)}°, Y: ${yDeg.toFixed(1)}°, Z: ${zDeg.toFixed(1)}°`, 
-      emoji: '📐' 
+
+    return {
+      description: 'Ring is slightly tilted',
+      details: `X: ${xDeg.toFixed(1)}°, Y: ${yDeg.toFixed(1)}°, Z: ${zDeg.toFixed(1)}°`,
+      emoji: '📐'
     };
   };
 
   // Get movement intensity description
   const getMovementIntensity = (): { level: string; color: string; description: string } => {
     if (!realAccelerometerData) return { level: 'None', color: 'gray', description: 'No data' };
-    
+
     const { gX, gY, gZ } = realAccelerometerData;
     const totalG = Math.sqrt(gX * gX + gY * gY + gZ * gZ);
-    
+
     if (totalG < 0.5) return { level: 'Very Still', color: 'blue', description: 'Ring is barely moving' };
     if (totalG < 1.2) return { level: 'Gentle', color: 'green', description: 'Light hand movements' };
     if (totalG < 2.0) return { level: 'Moderate', color: 'yellow', description: 'Normal hand gestures' };
@@ -147,7 +147,7 @@ export function AccelerometerCard({
   const getAxisDescription = (axis: 'X' | 'Y' | 'Z', value: number): string => {
     const absValue = Math.abs(value);
     const direction = value > 0 ? 'positive' : 'negative';
-    
+
     switch (axis) {
       case 'X':
         return `${direction} X: ${absValue > 1 ? 'Strong' : 'Weak'} ${value > 0 ? 'forward' : 'backward'} tilt`;
@@ -164,7 +164,7 @@ export function AccelerometerCard({
     <div className="rounded-xl border-2 border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Compass className="h-6 w-6 text-purple-600" />
+          <Compass className="h-6 w-6 text-blue-600 dark:text-blue-400" />
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
               Raw Accelerometer
@@ -174,7 +174,7 @@ export function AccelerometerCard({
             </p>
           </div>
         </div>
-        
+
         <div className="flex gap-2">
           <button
             onClick={handleCalibrate}
@@ -199,7 +199,7 @@ export function AccelerometerCard({
             disabled={!isConnected}
             className={`flex-1 flex items-center justify-center gap-2 py-3 px-4 rounded-lg font-medium transition-colors ${
               isConnected
-                ? 'bg-purple-600 hover:bg-purple-700 text-white'
+                ? 'bg-blue-600 hover:bg-blue-700 text-white'
                 : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
             }`}
           >
@@ -224,27 +224,23 @@ export function AccelerometerCard({
 
       {/* Hand Position Visual Guide */}
       {realAccelerometerData && (
-        <div className="mb-6 p-4 bg-gradient-to-br from-purple-50 to-blue-50 dark:from-purple-900/20 dark:to-blue-900/20 rounded-lg border-2 border-purple-200 dark:border-purple-700">
+        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
           <div className="text-center mb-4">
-            <h4 className="text-lg font-bold text-purple-900 dark:text-purple-100 mb-1">
-              👋 Your Current Hand Position
+            <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-1">
+              Current Hand Position
             </h4>
-            <p className="text-xs text-purple-600 dark:text-purple-300">
+            <p className="text-xs text-gray-600 dark:text-gray-300">
               Live tilt angles • {new Date(realAccelerometerData.timestamp).toLocaleTimeString()}
             </p>
           </div>
-          
+
           {/* Visual Hand Representation */}
           <div className="grid grid-cols-3 gap-3 mb-4">
             {/* Forward/Backward Tilt */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-red-200 dark:border-red-700">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-red-200 dark:border-red-700">
               <div className="text-center">
-                <div className="text-3xl mb-2">
-                  {toDegrees(realAccelerometerData.rotateX - calibrationOffset.x) > 15 ? '☝️' : 
-                   toDegrees(realAccelerometerData.rotateX - calibrationOffset.x) < -15 ? '👇' : '✋'}
-                </div>
-                <div className="text-xs font-semibold text-red-700 dark:text-red-300 mb-1">
-                  PITCH (Forward/Back)
+                <div className="text-xs font-semibold text-red-700 dark:text-red-300 mb-2">
+                  PITCH (X)
                 </div>
                 <div className="text-2xl font-bold text-red-600 dark:text-red-400">
                   {toDegrees(realAccelerometerData.rotateX - calibrationOffset.x).toFixed(0)}°
@@ -257,14 +253,10 @@ export function AccelerometerCard({
             </div>
 
             {/* Left/Right Tilt */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-green-200 dark:border-green-700">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-green-200 dark:border-green-700">
               <div className="text-center">
-                <div className="text-3xl mb-2">
-                  {toDegrees(realAccelerometerData.rotateY - calibrationOffset.y) > 15 ? '👉' : 
-                   toDegrees(realAccelerometerData.rotateY - calibrationOffset.y) < -15 ? '👈' : '✋'}
-                </div>
-                <div className="text-xs font-semibold text-green-700 dark:text-green-300 mb-1">
-                  ROLL (Left/Right)
+                <div className="text-xs font-semibold text-green-700 dark:text-green-300 mb-2">
+                  ROLL (Y)
                 </div>
                 <div className="text-2xl font-bold text-green-600 dark:text-green-400">
                   {toDegrees(realAccelerometerData.rotateY - calibrationOffset.y).toFixed(0)}°
@@ -277,14 +269,10 @@ export function AccelerometerCard({
             </div>
 
             {/* Twist/Rotation */}
-            <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border-2 border-blue-200 dark:border-blue-700">
+            <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-blue-200 dark:border-blue-700">
               <div className="text-center">
-                <div className="text-3xl mb-2">
-                  {toDegrees(realAccelerometerData.rotateZ - calibrationOffset.z) > 15 ? '🔄' : 
-                   toDegrees(realAccelerometerData.rotateZ - calibrationOffset.z) < -15 ? '🔃' : '✋'}
-                </div>
-                <div className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-1">
-                  YAW (Twist)
+                <div className="text-xs font-semibold text-blue-700 dark:text-blue-300 mb-2">
+                  YAW (Z)
                 </div>
                 <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
                   {toDegrees(realAccelerometerData.rotateZ - calibrationOffset.z).toFixed(0)}°
@@ -300,7 +288,7 @@ export function AccelerometerCard({
           {/* Quick Reference Guide */}
           <div className="bg-white dark:bg-gray-800 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
             <div className="text-xs font-semibold text-gray-700 dark:text-gray-300 mb-2">
-              📖 Quick Guide:
+              Quick Guide:
             </div>
             <div className="grid grid-cols-3 gap-2 text-xs text-gray-600 dark:text-gray-400">
               <div>
@@ -321,19 +309,18 @@ export function AccelerometerCard({
       {realAccelerometerData && (
         <div className="mb-6 space-y-4">
           {/* Orientation Status */}
-          <div className="p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
+          <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-2xl">{getOrientationDescription().emoji}</span>
               <div>
-                <div className="text-sm font-medium text-purple-800 dark:text-purple-200">
+                <div className="text-sm font-medium text-gray-800 dark:text-gray-200">
                   {getOrientationDescription().description}
                 </div>
-                <div className="text-xs text-purple-600 dark:text-purple-300">
+                <div className="text-xs text-gray-600 dark:text-gray-300">
                   {getOrientationDescription().details}
                 </div>
               </div>
             </div>
-            <div className="text-xs text-purple-500 dark:text-purple-400">
+            <div className="text-xs text-gray-500 dark:text-gray-400">
               Last update: {new Date(realAccelerometerData.timestamp).toLocaleTimeString()}
             </div>
           </div>
@@ -355,8 +342,8 @@ export function AccelerometerCard({
             </div>
             <div className="text-xs text-gray-500 dark:text-gray-400">
               Total G-force: {Math.sqrt(
-                realAccelerometerData.gX * realAccelerometerData.gX + 
-                realAccelerometerData.gY * realAccelerometerData.gY + 
+                realAccelerometerData.gX * realAccelerometerData.gX +
+                realAccelerometerData.gY * realAccelerometerData.gY +
                 realAccelerometerData.gZ * realAccelerometerData.gZ
               ).toFixed(2)}G
             </div>
@@ -371,10 +358,10 @@ export function AccelerometerCard({
           <div className="bg-red-50 dark:bg-red-900/20 rounded-lg p-4">
             <div className="text-center mb-3">
               <div className="text-sm font-medium text-red-800 dark:text-red-200 mb-1">
-                🔄 Pitch (X-Axis)
+                Pitch (X-Axis)
               </div>
               <div className="text-xs text-red-600 dark:text-red-300 mb-2">
-                Forward ⬆️ / Backward ⬇️ tilt
+                Forward / Backward tilt
               </div>
               <div className="text-2xl font-bold text-red-900 dark:text-red-100">
                 {toDegrees(realAccelerometerData.rotateX - calibrationOffset.x).toFixed(1)}°
@@ -427,10 +414,10 @@ export function AccelerometerCard({
           <div className="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4">
             <div className="text-center mb-3">
               <div className="text-sm font-medium text-blue-800 dark:text-blue-200 mb-1">
-                🔄 Yaw (Z-Axis)
+                Yaw (Z-Axis)
               </div>
               <div className="text-xs text-blue-600 dark:text-blue-300 mb-2">
-                Clockwise 🔄 / Counter-clockwise 🔃
+                Clockwise / Counter-clockwise rotation
               </div>
               <div className="text-2xl font-bold text-blue-900 dark:text-blue-100">
                 {toDegrees(realAccelerometerData.rotateZ - calibrationOffset.z).toFixed(1)}°
@@ -459,7 +446,7 @@ export function AccelerometerCard({
           <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
             Motion History (Last 20 readings)
           </h4>
-          
+
           <div className="grid grid-cols-3 gap-4">
             {/* X-axis history */}
             <div>
@@ -538,10 +525,10 @@ export function AccelerometerCard({
             </span>
           </div>
         </div>
-        
+
         <div className="text-xs text-gray-500 dark:text-gray-400">
-          {isRawDataMode 
-            ? (realAccelerometerData 
+          {isRawDataMode
+            ? (realAccelerometerData
                 ? '✅ Receiving live accelerometer data - try moving your hand to see changes!'
                 : '⏳ Raw data mode active - waiting for accelerometer packets...'
               )
@@ -581,9 +568,9 @@ export function AccelerometerCard({
         {/* Technical Details */}
         <div className="p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
           <p className="text-xs text-gray-600 dark:text-gray-300">
-            🔬 <strong>Technical:</strong> Based on @atc1441's MIDI Ring implementation. 
-            Uses 12-bit ADC values from ±4G accelerometer (range: -2048 to +2047), 
-            converted to G-force (-4G to +4G), then to rotation angles via atan2 calculations. 
+            🔬 <strong>Technical:</strong> Based on @atc1441's MIDI Ring implementation.
+            Uses 12-bit ADC values from ±4G accelerometer (range: -2048 to +2047),
+            converted to G-force (-4G to +4G), then to rotation angles via atan2 calculations.
             Raw data mode enables ~20Hz motion tracking for real-time applications.
           </p>
         </div>

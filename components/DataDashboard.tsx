@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Activity, Heart, TrendingUp, Zap, Settings, Target } from 'lucide-react';
+import { Activity, Heart, TrendingUp, Zap, Settings, Target, Paintbrush, MousePointer } from 'lucide-react';
 import { DataDashboardProps, RingData } from '../lib/types';
 import { DashboardHeader } from './DashboardHeader';
 import { ConnectionAlert } from './ConnectionAlert';
@@ -15,17 +15,19 @@ import { DailyStepsCard } from './DailyStepsCard';
 import { LiveStepsCard } from './LiveStepsCard';
 import { AccelerometerCard } from './AccelerometerCard';
 import { GestureTrainer } from './GestureTrainer';
+import { DrawingCanvas } from './DrawingCanvas';
+import { PointerControl } from './PointerControl';
 import { SpO2Card } from './SpO2Card';
 import { StatusFooter } from './StatusFooter';
 import { DebugInfo } from './DebugInfo';
 import { Tabs } from './Tabs';
 
 type ConnectionState = 'connected' | 'disconnected' | 'reconnecting' | 'low-power' | 'out-of-range';
-type TabId = 'overview' | 'health' | 'activity' | 'sensors' | 'gestures' | 'settings';
+type TabId = 'overview' | 'health' | 'activity' | 'sensors' | 'gestures' | 'drawing' | 'pointer' | 'settings';
 
 /**
  * DataDashboard Component
- * 
+ *
  * Displays real-time health metrics from the connected Colmi ring
  * in a responsive grid layout with automatic data polling.
  */
@@ -88,7 +90,7 @@ export function DataDashboard({ ringService }: DataDashboardProps) {
     try {
       // Request steps data on connection
       await ringService.requestSteps();
-      
+
       // Note: Battery and heart rate are now manual - user clicks buttons to refresh
     } catch (error) {
       console.error('Failed to request initial data:', error);
@@ -104,13 +106,13 @@ export function DataDashboard({ ringService }: DataDashboardProps) {
       try {
         // Start notifications for real-time data
         await ringService.startNotifications(handleDataUpdate, handleAccelerometerUpdate);
-        
+
         // Note: Automatic polling removed - now using manual buttons
         setIsPolling(false);
-        
+
         // Initial data request
         await requestData();
-        
+
       } catch (error) {
         console.error('Failed to initialize data stream:', error);
         setIsConnected(false);
@@ -134,7 +136,7 @@ export function DataDashboard({ ringService }: DataDashboardProps) {
       setIsConnected(connected);
       setIsHeartRateMonitoring(ringService.isHeartRateMonitoring());
       setIsSpO2Monitoring(ringService.isSpO2Monitoring());
-      
+
       if (connected) {
         setConnectionState('connected');
         setLastSeen(new Date());
@@ -171,7 +173,7 @@ export function DataDashboard({ ringService }: DataDashboardProps) {
     try {
       // Wait 2 seconds before attempting reconnection
       await new Promise(resolve => setTimeout(resolve, 2000));
-      
+
       const connected = await ringService.connect();
       if (connected) {
         setConnectionState('connected');
@@ -368,33 +370,33 @@ export function DataDashboard({ ringService }: DataDashboardProps) {
 
     try {
       console.log('🛑 Emergency Stop All - Stopping all monitoring modes...');
-      
+
       // Stop all monitoring modes simultaneously
       const stopPromises = [];
-      
+
       if (isHeartRateMonitoring) {
         stopPromises.push(ringService.stopRealTimeHeartRate());
       }
-      
+
       if (isSpO2Monitoring) {
         stopPromises.push(ringService.stopRealTimeSpO2());
       }
-      
+
       if (isRawDataMode) {
         stopPromises.push(ringService.stopRawDataMode());
       }
-      
+
       // Wait for all stop commands to complete
       await Promise.all(stopPromises);
-      
+
       // Update states
       setIsHeartRateMonitoring(false);
       setIsSpO2Monitoring(false);
       setIsRawDataMode(false);
       setAccelerometerData(null);
-      
+
       console.log('✅ All monitoring stopped - Ring should stop flashing');
-      
+
     } catch (error) {
       console.error('Error stopping all monitoring:', error);
       // Even if there's an error, update the states to reflect stopped status
@@ -430,22 +432,22 @@ export function DataDashboard({ ringService }: DataDashboardProps) {
 
     try {
       console.log('🔄 Rebooting ring...');
-      
+
       // Stop all monitoring first
       await handleStopAll();
-      
+
       // Wait a moment for stop commands to process
       await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       // Send reboot command
       await ringService.rebootRing();
-      
+
       // Update connection state
       setIsConnected(false);
       setConnectionState('disconnected');
-      
+
       console.log('✅ Ring reboot command sent - device is restarting');
-      
+
     } catch (error) {
       console.error('Error rebooting ring:', error);
       // Update connection state even if reboot failed
@@ -481,7 +483,7 @@ export function DataDashboard({ ringService }: DataDashboardProps) {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800 p-4 md:p-6">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 p-4 md:p-6">
       <div className="max-w-7xl mx-auto">
         <DashboardHeader
           isConnected={isConnected}
@@ -516,6 +518,8 @@ export function DataDashboard({ ringService }: DataDashboardProps) {
             { id: 'activity', label: 'Activity', icon: <TrendingUp /> },
             { id: 'sensors', label: 'Sensors', icon: <Zap /> },
             { id: 'gestures', label: 'Gestures', icon: <Target /> },
+            { id: 'drawing', label: 'Drawing', icon: <Paintbrush /> },
+            { id: 'pointer', label: '3D Pointer', icon: <MousePointer /> },
             { id: 'settings', label: 'Advanced', icon: <Settings /> },
           ]}
           activeTab={activeTab}
@@ -660,6 +664,32 @@ export function DataDashboard({ ringService }: DataDashboardProps) {
         {activeTab === 'gestures' && (
           <div className="space-y-6 tab-content">
             <GestureTrainer
+              isConnected={isConnected}
+              isRawDataMode={isRawDataMode}
+              accelerometerData={accelerometerData}
+              onStartRawData={handleStartRawData}
+              onStopRawData={handleStopRawData}
+            />
+          </div>
+        )}
+
+        {/* Drawing Tab */}
+        {activeTab === 'drawing' && (
+          <div className="space-y-6 tab-content">
+            <DrawingCanvas
+              isConnected={isConnected}
+              isRawDataMode={isRawDataMode}
+              accelerometerData={accelerometerData}
+              onStartRawData={handleStartRawData}
+              onStopRawData={handleStopRawData}
+            />
+          </div>
+        )}
+
+        {/* 3D Pointer Tab */}
+        {activeTab === 'pointer' && (
+          <div className="space-y-6 tab-content">
+            <PointerControl
               isConnected={isConnected}
               isRawDataMode={isRawDataMode}
               accelerometerData={accelerometerData}

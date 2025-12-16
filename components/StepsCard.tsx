@@ -10,7 +10,7 @@ interface StepsCardProps {
 
 export function StepsCard({ steps, isConnected, onRefreshSteps }: StepsCardProps) {
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center">
@@ -21,7 +21,7 @@ export function StepsCard({ steps, isConnected, onRefreshSteps }: StepsCardProps
           </h2>
         </div>
       </div>
-      
+
       <div className="text-center mb-4">
         {steps !== null ? (
           <>
@@ -59,7 +59,7 @@ export function StepsCard({ steps, isConnected, onRefreshSteps }: StepsCardProps
       {steps !== null && (
         <div className="mt-4">
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-            <div 
+            <div
               className="bg-green-600 h-2 rounded-full transition-all duration-300"
               style={{ width: `${Math.min((steps / 10000) * 100, 100)}%` }}
             ></div>
@@ -71,9 +71,9 @@ export function StepsCard({ steps, isConnected, onRefreshSteps }: StepsCardProps
       )}
 
       {/* Steps Instructions */}
-      <div className="mt-4 p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
-        <p className="text-xs text-green-700 dark:text-green-300 text-center">
-          👟 Click "Refresh Steps" to get current step count
+      <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <p className="text-xs text-gray-700 dark:text-gray-300 text-center">
+          Click "Refresh Steps" to get current step count
         </p>
       </div>
     </div>

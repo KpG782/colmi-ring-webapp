@@ -13,16 +13,16 @@ interface SpO2CardProps {
 
 /**
  * SpO2Card Component
- * 
+ *
  * Real-time blood oxygen saturation monitoring from Colmi ring.
  * Based on Python client's SPO2 real-time reading functionality.
  */
-export function SpO2Card({ 
-  spO2, 
-  isConnected, 
-  isSpO2Monitoring, 
-  onStartSpO2, 
-  onStopSpO2 
+export function SpO2Card({
+  spO2,
+  isConnected,
+  isSpO2Monitoring,
+  onStartSpO2,
+  onStopSpO2
 }: SpO2CardProps) {
   const [lastReading, setLastReading] = useState<number | null>(null);
   const [readingHistory, setReadingHistory] = useState<number[]>([]);
@@ -85,12 +85,12 @@ export function SpO2Card({
   };
 
   const status = getSpO2Status(spO2 ?? null);
-  const averageSpO2 = readingHistory.length > 0 
+  const averageSpO2 = readingHistory.length > 0
     ? Math.round(readingHistory.reduce((a, b) => a + b, 0) / readingHistory.length)
     : null;
 
   return (
-    <div className={`rounded-xl border-2 p-6 transition-all duration-200 ${getStatusColor(status)}`}>
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <Droplets className="h-6 w-6 text-blue-600" />
@@ -103,7 +103,7 @@ export function SpO2Card({
             </p>
           </div>
         </div>
-        
+
         {/* Status Indicator */}
         <div className="flex items-center gap-2">
           {getStatusIcon(status)}
@@ -121,7 +121,7 @@ export function SpO2Card({
         <div className="text-sm text-gray-600 dark:text-gray-300 mb-2">
           {getStatusMessage(status)}
         </div>
-        
+
         {/* Average Display */}
         {averageSpO2 && readingHistory.length > 1 && (
           <div className="text-xs text-gray-500 dark:text-gray-400">
@@ -224,10 +224,10 @@ export function SpO2Card({
             <span className="font-medium text-red-600">&lt;90%</span>
           </div>
         </div>
-        
-        <div className="mt-3 p-2 bg-gray-100 dark:bg-gray-700 rounded-lg">
-          <p className="text-xs text-gray-600 dark:text-gray-300">
-            💡 <strong>Tip:</strong> For accurate SpO2 readings, keep your hand still and ensure 
+
+        <div className="mt-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <p className="text-xs text-gray-700 dark:text-gray-300">
+            <strong>Tip:</strong> For accurate SpO2 readings, keep your hand still and ensure
             the ring has good contact with your finger. Readings may take 10-30 seconds to stabilize.
           </p>
         </div>

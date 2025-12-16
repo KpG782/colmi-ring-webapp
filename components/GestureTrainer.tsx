@@ -18,8 +18,8 @@ interface RecordedSample {
 }
 
 interface GestureAction {
-  type: 'image' | 'message' | 'sound' | 'url';
-  content: string; // URL for image/sound, text for message, URL for link
+  type: 'image' | 'message' | 'sound' | 'url' | 'youtube';
+  content: string; // URL for image/sound, text for message, URL for link, base64 for uploaded image
   emoji?: string;
 }
 
@@ -45,7 +45,7 @@ interface SavedGesture {
 
 /**
  * GestureTrainer Component
- * 
+ *
  * Tool for reverse engineering and analyzing accelerometer gestures.
  * Record movements, see the raw data patterns, and save them for recognition.
  */
@@ -64,7 +64,7 @@ export function GestureTrainer({
   const [smoothingLevel, setSmoothingLevel] = useState(3); // Number of samples to average
   const [smoothedData, setSmoothedData] = useState<AccelerometerData | null>(null);
   const dataBuffer = useRef<AccelerometerData[]>([]);
-  
+
   // Action trigger states
   const [showActionModal, setShowActionModal] = useState(false);
   const [triggeredAction, setTriggeredAction] = useState<GestureAction | null>(null);
@@ -72,9 +72,10 @@ export function GestureTrainer({
   const [lastTriggeredTime, setLastTriggeredTime] = useState(0);
   const [actionsEnabled, setActionsEnabled] = useState(true); // Toggle for showing/hiding action triggers
   const [editingActionForGesture, setEditingActionForGesture] = useState<SavedGesture | null>(null);
-  const [actionType, setActionType] = useState<'image' | 'message' | 'sound' | 'url'>('message');
+  const [actionType, setActionType] = useState<'image' | 'message' | 'sound' | 'url' | 'youtube'>('message');
   const [actionContent, setActionContent] = useState('');
   const [actionEmoji, setActionEmoji] = useState('🎉');
+  const [uploadedImageFile, setUploadedImageFile] = useState<File | null>(null);
 
   // Load gestures and actionsEnabled preference from localStorage on mount
   useEffect(() => {
@@ -117,7 +118,7 @@ export function GestureTrainer({
     if (accelerometerData) {
       // Add to buffer
       dataBuffer.current.push(accelerometerData);
-      
+
       // Keep only last N samples based on smoothing level
       if (dataBuffer.current.length > smoothingLevel) {
         dataBuffer.current.shift();
@@ -227,7 +228,7 @@ export function GestureTrainer({
       try {
         const content = e.target?.result as string;
         const imported = JSON.parse(content);
-        
+
         // Validate imported data
         if (!Array.isArray(imported)) {
           throw new Error('Invalid format: expected array of gestures');
@@ -264,7 +265,7 @@ export function GestureTrainer({
       }
     };
     reader.readAsText(file);
-    
+
     // Reset input so same file can be imported again
     event.target.value = '';
   };
@@ -288,26 +289,32 @@ export function GestureTrainer({
   const getCurrentMatch = (): { gesture: SavedGesture; confidence: number } | null => {
     if (!smoothedData || savedGestures.length === 0) return null;
 
-    let bestMatch: { gesture: SavedGesture; confidence: number } | null = null;
+    let bestMatchGesture: SavedGesture | null = null;
+    let bestConfidence = 0;
     let bestScore = Infinity;
 
-    savedGestures.forEach(gesture => {
+    savedGestures.forEach((gesture: SavedGesture) => {
       // Calculate distance from current position to gesture average
       const xDiff = Math.abs(smoothedData.rotateX - gesture.averages.rotateX);
       const yDiff = Math.abs(smoothedData.rotateY - gesture.averages.rotateY);
       const zDiff = Math.abs(smoothedData.rotateZ - gesture.averages.rotateZ);
-      
+
       const distance = Math.sqrt(xDiff * xDiff + yDiff * yDiff + zDiff * zDiff);
-      
+
       if (distance < bestScore) {
         bestScore = distance;
         const maxDistance = Math.PI / 2; // 90 degrees in radians
         const confidence = Math.max(0, (1 - (distance / maxDistance)) * 100);
-        bestMatch = { gesture, confidence };
+        bestMatchGesture = gesture;
+        bestConfidence = confidence;
       }
     });
 
-    return bestMatch && bestMatch.confidence > 30 ? bestMatch : null;
+    // Return match only if confidence is above threshold
+    if (bestMatchGesture && bestConfidence > 30) {
+      return { gesture: bestMatchGesture, confidence: bestConfidence };
+    }
+    return null;
   };
 
   const currentMatch = getCurrentMatch();
@@ -322,16 +329,33 @@ export function GestureTrainer({
         setTriggeredGestureName(currentMatch.gesture.name);
         setShowActionModal(true);
         setLastTriggeredTime(now);
-        
-        // Auto-close after 3 seconds for messages
-        if (currentMatch.gesture.action.type === 'message') {
+
+        // Auto-close after 3 seconds for messages and images
+        if (currentMatch.gesture.action.type === 'message' || currentMatch.gesture.action.type === 'image') {
           setTimeout(() => setShowActionModal(false), 3000);
+        }
+
+        // Open YouTube links in new tab (don't auto-close modal - manual close only)
+        if (currentMatch.gesture.action.type === 'youtube') {
+          window.open(currentMatch.gesture.action.content, '_blank');
         }
       }
     }
   }, [currentMatch, lastTriggeredTime]);
 
-  const saveActionForGesture = () => {
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.startsWith('image/')) {
+      setUploadedImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setActionContent(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const saveActionForGesture = async () => {
     if (!editingActionForGesture || !actionContent) {
       alert('Please enter content for the action');
       return;
@@ -343,8 +367,8 @@ export function GestureTrainer({
       emoji: actionEmoji
     };
 
-    setSavedGestures(prev => prev.map(g => 
-      g === editingActionForGesture 
+    setSavedGestures(prev => prev.map(g =>
+      g === editingActionForGesture
         ? { ...g, action }
         : g
     ));
@@ -634,7 +658,7 @@ export function GestureTrainer({
               </button>
             </div>
           </div>
-          
+
           {/* LocalStorage Info */}
           <div className="mb-3 p-2 bg-gray-50 dark:bg-gray-800 rounded text-xs text-gray-700 dark:text-gray-300">
             <div className="flex items-center gap-2">
@@ -660,8 +684,8 @@ export function GestureTrainer({
                       {gesture.name}
                     </div>
                     <div className="text-xs text-gray-600 dark:text-gray-400">
-                      {gesture.samples.length} samples • Avg: X={toDegrees(gesture.averages.rotateX).toFixed(0)}° 
-                      Y={toDegrees(gesture.averages.rotateY).toFixed(0)}° 
+                      {gesture.samples.length} samples • Avg: X={toDegrees(gesture.averages.rotateX).toFixed(0)}°
+                      Y={toDegrees(gesture.averages.rotateY).toFixed(0)}°
                       Z={toDegrees(gesture.averages.rotateZ).toFixed(0)}°
                     </div>
                   </div>
@@ -693,7 +717,7 @@ export function GestureTrainer({
                         <strong>Saved:</strong> {gesture.createdAt.toLocaleString()}
                       </div>
                     </div>
-                    
+
                     {/* Action Display/Config */}
                     <div className="pt-2 border-t border-gray-300 dark:border-gray-600">
                       {gesture.action ? (
@@ -769,7 +793,7 @@ export function GestureTrainer({
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
               Configure Action: "{editingActionForGesture.name}"
             </h3>
-            
+
             <div className="space-y-4">
               {/* Action Type Selection */}
               <div>
@@ -782,7 +806,8 @@ export function GestureTrainer({
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="message">Show Message</option>
-                  <option value="image">Show Image</option>
+                  <option value="image">Show Image (URL or Upload)</option>
+                  <option value="youtube">Play YouTube Video</option>
                   <option value="sound">Play Sound</option>
                   <option value="url">Open URL</option>
                 </select>
@@ -792,26 +817,77 @@ export function GestureTrainer({
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   {actionType === 'message' && 'Message Text:'}
-                  {actionType === 'image' && 'Image URL:'}
+                  {actionType === 'image' && 'Image (Upload or URL):'}
+                  {actionType === 'youtube' && 'YouTube Video URL:'}
                   {actionType === 'sound' && 'Sound URL:'}
                   {actionType === 'url' && 'URL to Open:'}
                 </label>
-                <textarea
-                  value={actionContent}
-                  onChange={(e) => setActionContent(e.target.value)}
-                  placeholder={
-                    actionType === 'message' ? 'Enter your message here...' :
-                    actionType === 'image' ? 'https://example.com/image.jpg' :
-                    actionType === 'sound' ? 'https://example.com/sound.mp3' :
-                    'https://example.com'
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  rows={actionType === 'message' ? 4 : 2}
-                />
+
                 {actionType === 'image' && (
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                    💡 Tip: Use imgur.com or similar to host images
-                  </p>
+                  <div className="space-y-3">
+                    {/* Image Upload */}
+                    <div>
+                      <label className="block w-full">
+                        <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-center cursor-pointer hover:border-blue-500 transition-colors">
+                          <input
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                          />
+                          <p className="text-sm text-gray-600 dark:text-gray-300">
+                            Click to upload image
+                          </p>
+                          {uploadedImageFile && (
+                            <p className="text-xs text-green-600 dark:text-green-400 mt-2">
+                              ✓ {uploadedImageFile.name}
+                            </p>
+                          )}
+                        </div>
+                      </label>
+                    </div>
+                    <div className="text-center text-xs text-gray-500 dark:text-gray-400">OR</div>
+                    <input
+                      type="text"
+                      value={uploadedImageFile ? '' : actionContent}
+                      onChange={(e) => {
+                        setActionContent(e.target.value);
+                        setUploadedImageFile(null);
+                      }}
+                      placeholder="Enter image URL (https://...)"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                      disabled={!!uploadedImageFile}
+                    />
+                  </div>
+                )}
+
+                {actionType === 'youtube' && (
+                  <div>
+                    <input
+                      type="text"
+                      value={actionContent}
+                      onChange={(e) => setActionContent(e.target.value)}
+                      placeholder="https://www.youtube.com/watch?v=..."
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    />
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                      YouTube link will open in new tab and stay open
+                    </p>
+                  </div>
+                )}
+
+                {actionType !== 'image' && actionType !== 'youtube' && (
+                  <textarea
+                    value={actionContent}
+                    onChange={(e) => setActionContent(e.target.value)}
+                    placeholder={
+                      actionType === 'message' ? 'Enter your message here...' :
+                      actionType === 'sound' ? 'https://example.com/sound.mp3' :
+                      'https://example.com'
+                    }
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    rows={actionType === 'message' ? 4 : 2}
+                  />
                 )}
               </div>
 
@@ -846,18 +922,18 @@ export function GestureTrainer({
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                 Gesture Detected: "{triggeredGestureName}"
               </h2>
-              
+
               {/* Action Content */}
               {triggeredAction.type === 'message' && (
                 <p className="text-lg text-gray-700 dark:text-gray-300 mb-6 whitespace-pre-wrap">
                   {triggeredAction.content}
                 </p>
               )}
-              
+
               {triggeredAction.type === 'image' && (
                 <div className="mb-6">
-                  <img 
-                    src={triggeredAction.content} 
+                  <img
+                    src={triggeredAction.content}
                     alt="Gesture action"
                     className="max-w-full max-h-96 mx-auto rounded-lg shadow-lg"
                     onError={(e) => {
@@ -866,11 +942,28 @@ export function GestureTrainer({
                   />
                 </div>
               )}
-              
+
+              {triggeredAction.type === 'youtube' && (
+                <div className="mb-6">
+                  <p className="text-gray-600 dark:text-gray-400 mb-4">YouTube video opened in new tab</p>
+                  <a
+                    href={triggeredAction.content}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 dark:text-blue-400 hover:underline break-all"
+                  >
+                    {triggeredAction.content}
+                  </a>
+                  <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                    Close this dialog to continue. Video will keep playing.
+                  </p>
+                </div>
+              )}
+
               {triggeredAction.type === 'url' && (
                 <div className="mb-6">
                   <p className="text-gray-600 dark:text-gray-400 mb-4">Opening URL:</p>
-                  <a 
+                  <a
                     href={triggeredAction.content}
                     target="_blank"
                     rel="noopener noreferrer"
@@ -880,11 +973,11 @@ export function GestureTrainer({
                   </a>
                 </div>
               )}
-              
+
               {triggeredAction.type === 'sound' && (
                 <audio src={triggeredAction.content} autoPlay className="hidden" />
               )}
-              
+
               <button
                 onClick={() => setShowActionModal(false)}
                 className="mt-4 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"

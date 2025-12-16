@@ -12,10 +12,10 @@ interface DashboardHeaderProps {
   isAnyMonitoringActive?: boolean;
 }
 
-export function DashboardHeader({ 
-  isConnected, 
-  lastUpdate, 
-  isPolling, 
+export function DashboardHeader({
+  isConnected,
+  lastUpdate,
+  isPolling,
   onDisconnect,
   onStopAll,
   onRebootRing,
@@ -31,7 +31,7 @@ export function DashboardHeader({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 md:p-6 mb-4 md:mb-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-4 md:p-6 mb-4 md:mb-6">
       <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 md:w-12 md:h-12 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
@@ -55,19 +55,19 @@ export function DashboardHeader({
             </p>
           </div>
         </div>
-        
+
         <div className="flex flex-wrap items-center gap-2 w-full lg:w-auto">
           {isPolling && (
             <RefreshCw className="h-4 w-4 text-blue-600 animate-spin" />
           )}
-          
+
           {/* Emergency Stop All Button */}
           {isConnected && onStopAll && (
             <button
               onClick={onStopAll}
               className={`flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 rounded-lg transition-colors font-medium text-sm ${
-                isAnyMonitoringActive 
-                  ? 'bg-orange-600 hover:bg-orange-700 text-white animate-pulse' 
+                isAnyMonitoringActive
+                  ? 'bg-orange-600 hover:bg-orange-700 text-white animate-pulse'
                   : 'bg-gray-400 hover:bg-gray-500 text-white'
               }`}
               title="Stop all monitoring (Heart Rate, SpO2, Raw Data) - Stops ring flashing"
@@ -90,7 +90,7 @@ export function DashboardHeader({
               <span className="sm:hidden">Reboot</span>
             </button>
           )}
-          
+
           <button
             onClick={onDisconnect}
             className="px-3 md:px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors text-sm"

@@ -102,9 +102,9 @@ export function LiveStepsCard({
   const goalProgress = getGoalProgress();
 
   return (
-    <div className={`rounded-xl border-2 p-6 transition-all duration-300 ${
+    <div className={`rounded-xl shadow-md border p-6 transition-all duration-300 ${
       isActive
-        ? 'border-green-400 bg-green-50 dark:bg-green-900/20 shadow-lg'
+        ? 'border-green-400 bg-white dark:bg-gray-800'
         : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800'
     }`}>
       <div className="flex items-center justify-between mb-4">

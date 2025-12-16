@@ -34,7 +34,7 @@ export function HeartRateCard({
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
@@ -54,7 +54,7 @@ export function HeartRateCard({
           </span>
         </div>
       </div>
-      
+
       <div className="text-center mb-4">
         {heartRate !== null ? (
           <>
@@ -107,9 +107,9 @@ export function HeartRateCard({
 
       {/* Instructions */}
       {!isHeartRateMonitoring && (
-        <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
-          <p className="text-xs text-blue-700 dark:text-blue-300 text-center">
-            💡 Put ring on finger, then click "Start Monitoring" for real-time heart rate
+        <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <p className="text-xs text-gray-700 dark:text-gray-300 text-center">
+            Put ring on finger, then click "Start Monitoring" for real-time heart rate
           </p>
         </div>
       )}

@@ -31,7 +31,7 @@ export function BatteryCard({ battery, isConnected, onRefreshBattery }: BatteryC
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
+    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-yellow-100 dark:bg-yellow-900 rounded-full flex items-center justify-center">
@@ -42,7 +42,7 @@ export function BatteryCard({ battery, isConnected, onRefreshBattery }: BatteryC
           </h2>
         </div>
       </div>
-      
+
       <div className="text-center mb-4">
         {battery !== null ? (
           <>
@@ -80,7 +80,7 @@ export function BatteryCard({ battery, isConnected, onRefreshBattery }: BatteryC
       {battery !== null && (
         <div className="mt-4">
           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-            <div 
+            <div
               className={`h-2 rounded-full transition-all duration-300 ${getBatteryBarColor(battery)}`}
               style={{ width: `${battery}%` }}
             ></div>

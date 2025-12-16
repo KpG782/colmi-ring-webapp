@@ -117,4 +117,30 @@ export interface BLEConfig {
   notifyCharacteristicUUID: string;
 }
 
+/**
+ * Recorded accelerometer sample with timestamp
+ */
+export interface RecordedSample {
+  /** Unix timestamp when sample was recorded */
+  timestamp: number;
+  /** Accelerometer data at this point in time */
+  data: AccelerometerData;
+}
+
+/**
+ * Saved gesture data for gesture recognition
+ */
+export interface SavedGesture {
+  /** User-friendly name for the gesture */
+  name: string;
+  /** Array of recorded samples for this gesture */
+  samples: RecordedSample[];
+  /** Average values across all samples (for quick matching) */
+  averages: number[];
+  /** Range of values for each axis (for normalization) */
+  ranges: number[];
+  /** Timestamp when gesture was created */
+  createdAt: Date;
+}
+
 // ColmiRingService is now exported from ./colmi-ring-service

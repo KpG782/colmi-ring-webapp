@@ -16,6 +16,8 @@ export { DailyStepsCard } from './DailyStepsCard';
 export { LiveStepsCard } from './LiveStepsCard';
 export { AccelerometerCard } from './AccelerometerCard';
 export { GestureTrainer } from './GestureTrainer';
+export { DrawingCanvas } from './DrawingCanvas';
+export { PointerControl } from './PointerControl';
 export { SpO2Card } from './SpO2Card';
 export { HeartRateCard } from './HeartRateCard';
 export { StepsCard } from './StepsCard';

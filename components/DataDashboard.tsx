@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { Activity, Heart, TrendingUp, Zap, Settings } from 'lucide-react';
+import { Activity, Heart, TrendingUp, Zap, Settings, Target } from 'lucide-react';
 import { DataDashboardProps, RingData } from '../lib/types';
 import { DashboardHeader } from './DashboardHeader';
 import { ConnectionAlert } from './ConnectionAlert';
@@ -515,7 +515,7 @@ export function DataDashboard({ ringService }: DataDashboardProps) {
             { id: 'health', label: 'Health Metrics', icon: <Heart /> },
             { id: 'activity', label: 'Activity', icon: <TrendingUp /> },
             { id: 'sensors', label: 'Sensors', icon: <Zap /> },
-            { id: 'gestures', label: 'Gesture Training', icon: <span className="text-xl">🤚</span> },
+            { id: 'gestures', label: 'Gestures', icon: <Target /> },
             { id: 'settings', label: 'Advanced', icon: <Settings /> },
           ]}
           activeTab={activeTab}

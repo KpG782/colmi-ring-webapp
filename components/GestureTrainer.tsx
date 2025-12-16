@@ -355,7 +355,7 @@ export function GestureTrainer({
   };
 
   return (
-    <div className="rounded-xl border-2 border-orange-200 dark:border-orange-700 bg-white dark:bg-gray-800 p-6">
+    <div className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6">
       <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
           <Target className="h-6 w-6 text-orange-600" />
@@ -448,17 +448,14 @@ export function GestureTrainer({
       </div>
 
       {/* Action Triggers Toggle */}
-      <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-700">
+      <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{actionsEnabled ? '🔔' : '🔕'}</span>
-            <div>
-              <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-                Action Triggers
-              </div>
-              <div className="text-xs text-gray-600 dark:text-gray-400">
-                {actionsEnabled ? 'Actions will show when gestures are detected' : 'Actions are disabled'}
-              </div>
+          <div>
+            <div className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+              Action Triggers
+            </div>
+            <div className="text-xs text-gray-600 dark:text-gray-400">
+              {actionsEnabled ? 'Enabled - Actions will trigger on gesture detection' : 'Disabled - No actions will trigger'}
             </div>
           </div>
           <button
@@ -480,9 +477,9 @@ export function GestureTrainer({
 
       {/* Current Live Data */}
       {smoothedData && (
-        <div className="mb-6 p-4 bg-purple-50 dark:bg-purple-900/20 rounded-lg border border-purple-200 dark:border-purple-700">
-          <h4 className="text-sm font-bold text-purple-900 dark:text-purple-100 mb-3">
-            📡 Live Smoothed Data (What you're doing RIGHT NOW):
+        <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+          <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-3">
+            Live Smoothed Data
           </h4>
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-white dark:bg-gray-800 rounded p-2">
@@ -581,13 +578,12 @@ export function GestureTrainer({
 
       {/* No Gestures - Show Import Option */}
       {savedGestures.length === 0 && !isRecording && recordedSamples.length === 0 && (
-        <div className="mb-6 p-6 bg-gray-50 dark:bg-gray-700 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 text-center">
-          <div className="text-4xl mb-3">📦</div>
+        <div className="mb-6 p-6 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-300 dark:border-gray-600 text-center">
           <h4 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-            No Gestures Yet
+            No Gestures Recorded
           </h4>
           <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
-            Record your first gesture or import existing ones
+            Record your first gesture or import from file
           </p>
           <div className="flex gap-2 justify-center">
             <label className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg cursor-pointer font-medium">
@@ -609,7 +605,7 @@ export function GestureTrainer({
         <div className="mb-6">
           <div className="flex items-center justify-between mb-3">
             <h4 className="text-sm font-bold text-gray-900 dark:text-white">
-              💾 Saved Gestures ({savedGestures.length})
+              Saved Gestures ({savedGestures.length})
             </h4>
             <div className="flex gap-2">
               <label className="flex items-center gap-1 px-3 py-1 text-xs bg-green-600 hover:bg-green-700 text-white rounded cursor-pointer">
@@ -640,10 +636,10 @@ export function GestureTrainer({
           </div>
           
           {/* LocalStorage Info */}
-          <div className="mb-3 p-2 bg-blue-50 dark:bg-blue-900/20 rounded text-xs text-blue-800 dark:text-blue-200">
+          <div className="mb-3 p-2 bg-gray-50 dark:bg-gray-800 rounded text-xs text-gray-700 dark:text-gray-300">
             <div className="flex items-center gap-2">
               <CheckCircle className="h-3 w-3" />
-              <span>Auto-saved to browser localStorage • Import/Export for backup</span>
+              <span>Auto-saved locally • Use Import/Export for backup</span>
             </div>
           </div>
 
@@ -701,10 +697,10 @@ export function GestureTrainer({
                     {/* Action Display/Config */}
                     <div className="pt-2 border-t border-gray-300 dark:border-gray-600">
                       {gesture.action ? (
-                        <div className="p-2 bg-green-50 dark:bg-green-900/20 rounded">
+                        <div className="p-2 bg-gray-50 dark:bg-gray-800 rounded">
                           <div className="flex items-center justify-between mb-1">
-                            <div className="text-xs font-bold text-green-800 dark:text-green-200">
-                              {gesture.action.emoji} Action Configured
+                            <div className="text-xs font-bold text-gray-800 dark:text-gray-200">
+                              Action: {gesture.action.type}
                             </div>
                             <button
                               onClick={(e) => {
@@ -750,11 +746,11 @@ export function GestureTrainer({
       )}
 
       {/* Quick Action Ideas */}
-      <div className="p-4 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-700">
-        <h4 className="text-sm font-bold text-yellow-900 dark:text-yellow-100 mb-2">
-          💡 Suggested Actions to Try:
+      <div className="p-4 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
+        <h4 className="text-sm font-bold text-gray-900 dark:text-white mb-2">
+          Suggested Gestures
         </h4>
-        <div className="grid grid-cols-2 gap-2 text-xs text-yellow-800 dark:text-yellow-200">
+        <div className="grid grid-cols-2 gap-2 text-xs text-gray-700 dark:text-gray-300">
           <div>• Point Up (Pitch +45°)</div>
           <div>• Point Down (Pitch -45°)</div>
           <div>• Tilt Right (Roll +30°)</div>
@@ -771,7 +767,7 @@ export function GestureTrainer({
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
           <div className="bg-white dark:bg-gray-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
             <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-4">
-              🎬 Configure Action for "{editingActionForGesture.name}"
+              Configure Action: "{editingActionForGesture.name}"
             </h3>
             
             <div className="space-y-4">
@@ -785,33 +781,11 @@ export function GestureTrainer({
                   onChange={(e) => setActionType(e.target.value as any)}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
-                  <option value="message">💬 Show Message</option>
-                  <option value="image">🖼️ Show Image</option>
-                  <option value="sound">🔊 Play Sound</option>
-                  <option value="url">🔗 Open URL</option>
+                  <option value="message">Show Message</option>
+                  <option value="image">Show Image</option>
+                  <option value="sound">Play Sound</option>
+                  <option value="url">Open URL</option>
                 </select>
-              </div>
-
-              {/* Emoji Selection */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Emoji:
-                </label>
-                <div className="flex gap-2">
-                  {['🎉', '👍', '✨', '🚀', '💡', '❤️', '⭐', '🔥'].map(emoji => (
-                    <button
-                      key={emoji}
-                      onClick={() => setActionEmoji(emoji)}
-                      className={`text-2xl p-2 rounded ${
-                        actionEmoji === emoji 
-                          ? 'bg-blue-100 dark:bg-blue-900 ring-2 ring-blue-500' 
-                          : 'hover:bg-gray-100 dark:hover:bg-gray-700'
-                      }`}
-                    >
-                      {emoji}
-                    </button>
-                  ))}
-                </div>
               </div>
 
               {/* Content Input */}
@@ -869,10 +843,7 @@ export function GestureTrainer({
         <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4 animate-fadeIn">
           <div className="bg-white dark:bg-gray-800 rounded-2xl max-w-2xl w-full p-8 shadow-2xl transform animate-scaleIn">
             <div className="text-center">
-              <div className="text-6xl mb-4 animate-bounce">
-                {triggeredAction.emoji}
-              </div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
                 Gesture Detected: "{triggeredGestureName}"
               </h2>
               
@@ -916,7 +887,7 @@ export function GestureTrainer({
               
               <button
                 onClick={() => setShowActionModal(false)}
-                className="mt-4 px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-medium text-lg"
+                className="mt-4 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium"
               >
                 Close
               </button>

@@ -1,0 +1,54 @@
+{
+  "name": "colmi-ring-dashboard",
+  "version": "1.0.0",
+  "description": "Real-time web dashboard for Colmi R02/R09 smart rings built with Next.js and Web Bluetooth API",
+  "author": "Colmi Ring Dashboard Contributors",
+  "license": "MIT",
+  "keywords": [
+    "colmi",
+    "smart-ring",
+    "bluetooth",
+    "web-bluetooth",
+    "health-monitoring",
+    "nextjs",
+    "react",
+    "typescript"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/colmi-ring-dashboard.git"
+  },
+  "bugs": {
+    "url": "https://github.com/yourusername/colmi-ring-dashboard/issues"
+  },
+  "homepage": "https://github.com/yourusername/colmi-ring-dashboard#readme",
+  "private": false,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint . --ext .ts,.tsx",
+    "lint:fix": "eslint . --ext .ts,.tsx --fix",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\""
+  },
+  "dependencies": {
+    "lucide-react": "^0.561.0",
+    "next": "16.0.10",
+    "react": "19.2.1",
+    "react-dom": "19.2.1",
+    "recharts": "^3.6.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "@types/web-bluetooth": "^0.0.21",
+    "eslint": "^9",
+    "eslint-config-next": "16.0.10",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}

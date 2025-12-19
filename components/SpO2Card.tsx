@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { Droplets, Play, Square, RefreshCw, AlertTriangle, CheckCircle } from 'lucide-react';
+import { GlassCard, MetricDisplay, StatusIndicator, AnimatedButton } from './glass';
 
 interface SpO2CardProps {
   spO2?: number | null;
@@ -89,92 +90,113 @@ export function SpO2Card({
     ? Math.round(readingHistory.reduce((a, b) => a + b, 0) / readingHistory.length)
     : null;
 
+  const getSpO2StatusForMetric = (value: number | null): 'success' | 'warning' | 'error' | 'neutral' => {
+    if (value === null) return 'neutral';
+    if (value >= 95) return 'success';
+    if (value >= 90) return 'warning';
+    return 'error';
+  };
+
+  const getTrend = (value: number | null): 'up' | 'down' | 'stable' | undefined => {
+    if (value === null) return undefined;
+    if (value >= 98) return 'up';
+    if (value < 92) return 'down';
+    return 'stable';
+  };
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6">
-      <div className="flex items-center justify-between mb-4">
+    <GlassCard glow="blue" className="relative overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <Droplets className="h-6 w-6 text-blue-600" />
+          <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
+            <Droplets className="h-5 w-5 text-white" />
+          </div>
           <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            <h2 className="text-lg font-semibold text-gray-900">
               Blood Oxygen (SpO2)
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300">
+            </h2>
+            <p className="text-sm text-gray-600">
               Real-time oxygen saturation
             </p>
           </div>
         </div>
 
-        {/* Status Indicator */}
+        {/* Status Indicators */}
         <div className="flex items-center gap-2">
           {getStatusIcon(status)}
-          {isSpO2Monitoring && (
-            <div className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
-          )}
+          <StatusIndicator
+            status={isSpO2Monitoring ? 'active' : 'neutral'}
+            pulse={isSpO2Monitoring}
+          />
         </div>
       </div>
 
-      {/* Main SpO2 Display */}
-      <div className="text-center mb-6">
-        <div className="text-4xl font-bold text-gray-900 dark:text-white mb-2">
-          {spO2 !== null ? `${spO2}%` : '---'}
-        </div>
-        <div className="text-sm text-gray-600 dark:text-gray-300 mb-2">
-          {getStatusMessage(status)}
-        </div>
+      {/* Metric Display */}
+      <MetricDisplay
+        value={spO2 !== null ? `${spO2}%` : null}
+        unit="SpO2"
+        label="Blood Oxygen"
+        status={getSpO2StatusForMetric(spO2 ?? null)}
+        trend={getTrend(spO2 ?? null)}
+        miniChart={spO2 !== null}
+        className="mb-6"
+      />
 
-        {/* Average Display */}
-        {averageSpO2 && readingHistory.length > 1 && (
-          <div className="text-xs text-gray-500 dark:text-gray-400">
+      {/* Average Display */}
+      {averageSpO2 && readingHistory.length > 1 && (
+        <div className="text-center mb-4">
+          <span className="text-xs font-medium px-3 py-1 rounded-full bg-blue-100 text-blue-700">
             Average: {averageSpO2}% ({readingHistory.length} readings)
-          </div>
-        )}
-      </div>
+          </span>
+        </div>
+      )}
 
       {/* Control Buttons */}
       <div className="flex gap-2 mb-4">
         {!isSpO2Monitoring ? (
-          <button
+          <AnimatedButton
+            variant="primary"
+            size="sm"
             onClick={onStartSpO2}
             disabled={!isConnected}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium transition-colors ${
-              isConnected
-                ? 'bg-blue-600 hover:bg-blue-700 text-white'
-                : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-            }`}
+            hoverEffect="lift"
+            shadowColor="blue"
+            className="flex-1"
           >
             <Play className="h-4 w-4" />
             Start SpO2
-          </button>
+          </AnimatedButton>
         ) : (
-          <button
+          <AnimatedButton
+            variant="secondary"
+            size="sm"
             onClick={onStopSpO2}
             disabled={!isConnected}
-            className={`flex-1 flex items-center justify-center gap-2 py-2 px-4 rounded-lg font-medium transition-colors ${
-              isConnected
-                ? 'bg-red-600 hover:bg-red-700 text-white'
-                : 'bg-gray-300 dark:bg-gray-600 text-gray-500 dark:text-gray-400 cursor-not-allowed'
-            }`}
+            hoverEffect="lift"
+            shadowColor="red"
+            className="flex-1 bg-red-500 hover:bg-red-600 text-white border-red-500/20"
           >
             <Square className="h-4 w-4" />
             Stop SpO2
-          </button>
+          </AnimatedButton>
         )}
       </div>
 
       {/* Reading History Visualization */}
       {readingHistory.length > 1 && (
         <div className="mb-4">
-          <div className="text-xs text-gray-600 dark:text-gray-300 mb-2">
+          <div className="text-xs text-gray-600 mb-2 font-medium">
             Recent readings:
           </div>
-          <div className="flex gap-1 h-8">
+          <div className="flex gap-1 h-8 bg-white/20 rounded-lg p-1 backdrop-blur-sm">
             {readingHistory.slice(-8).map((reading, index) => {
               const height = Math.max(10, (reading / 100) * 100);
-              const color = reading >= 95 ? 'bg-green-500' : reading >= 90 ? 'bg-yellow-500' : 'bg-red-500';
+              const color = reading >= 95 ? 'bg-emerald-500' : reading >= 90 ? 'bg-amber-500' : 'bg-red-500';
               return (
                 <div
                   key={index}
-                  className={`flex-1 ${color} rounded-sm opacity-70 hover:opacity-100 transition-opacity`}
+                  className={`flex-1 ${color} rounded-sm opacity-70 hover:opacity-100 transition-all duration-200 hover:scale-105`}
                   style={{ height: `${height}%` }}
                   title={`${reading}%`}
                 />
@@ -186,52 +208,54 @@ export function SpO2Card({
 
       {/* SpO2 Monitoring Status */}
       {isSpO2Monitoring && (
-        <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+        <GlassCard size="sm" className="mb-4 bg-blue-50/50 border-blue-200/30">
           <div className="flex items-center gap-2">
             <RefreshCw className="h-4 w-4 text-blue-600 animate-spin" />
-            <span className="text-sm font-medium text-blue-800 dark:text-blue-200">
+            <span className="text-sm font-medium text-blue-800">
               Monitoring blood oxygen levels...
             </span>
           </div>
-          <p className="text-xs text-blue-600 dark:text-blue-300 mt-1">
+          <p className="text-xs text-blue-600 mt-1">
             Keep ring still on finger for accurate readings
           </p>
-        </div>
+        </GlassCard>
       )}
 
       {/* Connection Status */}
       {!isConnected && (
-        <div className="p-3 bg-red-50 dark:bg-red-900/20 rounded-lg">
-          <p className="text-sm text-red-700 dark:text-red-300 text-center">
+        <GlassCard size="sm" className="mb-4 bg-red-50/50 border-red-200/30">
+          <p className="text-sm text-red-700 text-center">
             Ring disconnected - SpO2 monitoring unavailable
           </p>
-        </div>
+        </GlassCard>
       )}
 
       {/* SpO2 Information */}
-      <div className="border-t border-gray-200 dark:border-gray-600 pt-4">
-        <div className="text-xs text-gray-600 dark:text-gray-300 space-y-1">
-          <div className="flex justify-between">
-            <span>Normal range:</span>
-            <span className="font-medium">95-100%</span>
-          </div>
-          <div className="flex justify-between">
-            <span>Low oxygen:</span>
-            <span className="font-medium text-yellow-600">90-94%</span>
+      <GlassCard size="sm" className="bg-white/40 border-white/30">
+        <div className="text-xs text-gray-700 space-y-2">
+          <div className="grid grid-cols-2 gap-2">
+            <div className="flex justify-between">
+              <span>Normal:</span>
+              <span className="font-medium text-emerald-600">95-100%</span>
+            </div>
+            <div className="flex justify-between">
+              <span>Low:</span>
+              <span className="font-medium text-amber-600">90-94%</span>
+            </div>
           </div>
           <div className="flex justify-between">
             <span>Critical:</span>
             <span className="font-medium text-red-600">&lt;90%</span>
           </div>
+          
+          <div className="pt-2 border-t border-white/20">
+            <p className="text-xs text-gray-600">
+              <strong>Tip:</strong> Keep hand still and ensure good ring contact. 
+              Readings stabilize in 10-30 seconds.
+            </p>
+          </div>
         </div>
-
-        <div className="mt-3 p-2 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-xs text-gray-700 dark:text-gray-300">
-            <strong>Tip:</strong> For accurate SpO2 readings, keep your hand still and ensure
-            the ring has good contact with your finger. Readings may take 10-30 seconds to stabilize.
-          </p>
-        </div>
-      </div>
-    </div>
+      </GlassCard>
+    </GlassCard>
   );
 }

@@ -1,6 +1,9 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ThemeProvider } from "../lib/design-system/ThemeProvider";
+import { ToastProvider } from "../components/glass/ToastContainer";
+import { ErrorBoundary } from "../components/glass/ErrorBoundary";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -34,7 +37,18 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ThemeProvider>
+          <ToastProvider>
+            <ErrorBoundary>
+              <a href="#main-content" className="skip-link">
+                Skip to main content
+              </a>
+              <div id="main-content">
+                {children}
+              </div>
+            </ErrorBoundary>
+          </ToastProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

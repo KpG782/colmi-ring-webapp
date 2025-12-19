@@ -1,6 +1,6 @@
 'use client';
 
-import { Bluetooth, BluetoothOff, RefreshCw, Square, RotateCcw } from 'lucide-react';
+import { Bluetooth, BluetoothOff, RefreshCw, Square, RotateCcw, Maximize2 } from 'lucide-react';
 
 interface DashboardHeaderProps {
   isConnected: boolean;
@@ -10,6 +10,7 @@ interface DashboardHeaderProps {
   onStopAll?: () => void;
   onRebootRing?: () => void;
   isAnyMonitoringActive?: boolean;
+  onOpenFullscreenGesture?: () => void;
 }
 
 export function DashboardHeader({
@@ -19,7 +20,8 @@ export function DashboardHeader({
   onDisconnect,
   onStopAll,
   onRebootRing,
-  isAnyMonitoringActive = false
+  isAnyMonitoringActive = false,
+  onOpenFullscreenGesture
 }: DashboardHeaderProps) {
   const formatTimestamp = (date: Date): string => {
     return date.toLocaleTimeString('en-US', {
@@ -75,6 +77,19 @@ export function DashboardHeader({
               <Square className="h-3 w-3 md:h-4 md:w-4" />
               <span className="hidden sm:inline">{isAnyMonitoringActive ? 'Stop All (Flashing)' : 'Stop All'}</span>
               <span className="sm:hidden">Stop</span>
+            </button>
+          )}
+
+          {/* Fullscreen Gesture Mode Button */}
+          {isConnected && onOpenFullscreenGesture && (
+            <button
+              onClick={onOpenFullscreenGesture}
+              className="flex items-center gap-1 md:gap-2 px-3 md:px-4 py-2 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white rounded-lg transition-colors font-medium text-sm shadow-lg"
+              title="Open fullscreen gesture training mode with camera"
+            >
+              <Maximize2 className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Gesture Mode</span>
+              <span className="sm:hidden">Gesture</span>
             </button>
           )}
 

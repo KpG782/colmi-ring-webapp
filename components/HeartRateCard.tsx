@@ -1,6 +1,7 @@
 'use client';
 
 import { Heart } from 'lucide-react';
+import { GlassCard, MetricDisplay, StatusIndicator, AnimatedButton } from './glass';
 
 interface HeartRateCardProps {
   heartRate: number | null;
@@ -17,15 +18,15 @@ export function HeartRateCard({
   onStartHeartRate,
   onStopHeartRate
 }: HeartRateCardProps) {
-  const getHeartRateColor = (heartRate: number | null): string => {
-    if (heartRate === null) return 'text-gray-400';
-    if (heartRate < 60) return 'text-blue-600';
-    if (heartRate < 100) return 'text-green-600';
-    if (heartRate < 150) return 'text-yellow-600';
-    return 'text-red-600';
+  const getHeartRateStatus = (heartRate: number | null): 'success' | 'warning' | 'error' | 'neutral' => {
+    if (heartRate === null) return 'neutral';
+    if (heartRate < 60) return 'neutral';
+    if (heartRate < 100) return 'success';
+    if (heartRate < 150) return 'warning';
+    return 'error';
   };
 
-  const getHeartRateStatus = (heartRate: number | null): string => {
+  const getHeartRateStatusText = (heartRate: number | null): string => {
     if (heartRate === null) return '';
     if (heartRate < 60) return 'Resting';
     if (heartRate < 100) return 'Normal';
@@ -33,86 +34,93 @@ export function HeartRateCard({
     return 'High';
   };
 
+  const getTrend = (heartRate: number | null): 'up' | 'down' | 'stable' | undefined => {
+    if (heartRate === null) return undefined;
+    if (heartRate > 100) return 'up';
+    if (heartRate < 60) return 'down';
+    return 'stable';
+  };
+
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-md border border-gray-200 dark:border-gray-700 p-6">
-      <div className="flex items-center justify-between mb-4">
+    <GlassCard glow="blue" className="relative overflow-hidden">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-6">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 bg-red-100 dark:bg-red-900 rounded-full flex items-center justify-center">
-            <Heart className="h-5 w-5 text-red-600 dark:text-red-400" />
+          <div className="w-10 h-10 bg-gradient-to-r from-red-500 to-red-600 rounded-full flex items-center justify-center">
+            <Heart className="h-5 w-5 text-white" />
           </div>
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <h2 className="text-lg font-semibold text-gray-900">
             Heart Rate
           </h2>
         </div>
-        {/* Heart Rate Status Indicator */}
-        <div className="flex items-center gap-2">
-          {isHeartRateMonitoring && (
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-          )}
-          <span className="text-xs text-gray-500 dark:text-gray-400">
-            {isHeartRateMonitoring ? 'Monitoring' : 'Stopped'}
+        
+        {/* Status Indicator */}
+        <StatusIndicator
+          status={isHeartRateMonitoring ? 'active' : 'neutral'}
+          label={isHeartRateMonitoring ? 'Monitoring' : 'Stopped'}
+          pulse={isHeartRateMonitoring}
+        />
+      </div>
+
+      {/* Metric Display */}
+      <MetricDisplay
+        value={heartRate}
+        unit="BPM"
+        label="Heart Rate"
+        status={getHeartRateStatus(heartRate)}
+        trend={getTrend(heartRate)}
+        miniChart={heartRate !== null}
+        className="mb-6"
+      />
+
+      {/* Status Text */}
+      {heartRate !== null && (
+        <div className="text-center mb-4">
+          <span className={`text-xs font-medium px-3 py-1 rounded-full ${
+            getHeartRateStatus(heartRate) === 'success' ? 'bg-emerald-100 text-emerald-700' :
+            getHeartRateStatus(heartRate) === 'warning' ? 'bg-amber-100 text-amber-700' :
+            getHeartRateStatus(heartRate) === 'error' ? 'bg-red-100 text-red-700' :
+            'bg-gray-100 text-gray-700'
+          }`}>
+            {getHeartRateStatusText(heartRate)}
           </span>
         </div>
-      </div>
+      )}
 
-      <div className="text-center mb-4">
-        {heartRate !== null ? (
-          <>
-            <div className={`text-4xl font-bold mb-2 ${getHeartRateColor(heartRate)}`}>
-              {heartRate}
-            </div>
-            <p className="text-sm text-gray-600 dark:text-gray-300">BPM</p>
-          </>
-        ) : (
-          <>
-            <div className="text-4xl font-bold text-gray-400 mb-2">--</div>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              {isHeartRateMonitoring ? 'Waiting for reading...' : 'No data available'}
-            </p>
-          </>
-        )}
-      </div>
-
-      {/* Heart Rate Control Buttons */}
+      {/* Control Buttons */}
       <div className="flex gap-2 mb-4">
-        <button
+        <AnimatedButton
+          variant="secondary"
+          size="sm"
           onClick={onStartHeartRate}
           disabled={!isConnected || isHeartRateMonitoring}
-          className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-            !isConnected || isHeartRateMonitoring
-              ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-green-600 hover:bg-green-700 text-white'
-          }`}
+          hoverEffect="lift"
+          shadowColor="emerald"
+          className="flex-1 bg-emerald-500 hover:bg-emerald-600 text-white border-emerald-500/20"
         >
           Start Monitoring
-        </button>
-        <button
+        </AnimatedButton>
+        <AnimatedButton
+          variant="secondary"
+          size="sm"
           onClick={onStopHeartRate}
           disabled={!isConnected || !isHeartRateMonitoring}
-          className={`flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors ${
-            !isConnected || !isHeartRateMonitoring
-              ? 'bg-gray-200 dark:bg-gray-600 text-gray-400 cursor-not-allowed'
-              : 'bg-red-600 hover:bg-red-700 text-white'
-          }`}
+          hoverEffect="lift"
+          shadowColor="red"
+          className="flex-1 bg-red-500 hover:bg-red-600 text-white border-red-500/20"
         >
           Stop Monitoring
-        </button>
+        </AnimatedButton>
       </div>
-
-      {heartRate !== null && (
-        <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-          {getHeartRateStatus(heartRate)}
-        </div>
-      )}
 
       {/* Instructions */}
       {!isHeartRateMonitoring && (
-        <div className="mt-4 p-3 bg-gray-50 dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700">
-          <p className="text-xs text-gray-700 dark:text-gray-300 text-center">
+        <GlassCard size="sm" className="bg-white/50 border-white/30">
+          <p className="text-xs text-gray-700 text-center">
             Put ring on finger, then click "Start Monitoring" for real-time heart rate
           </p>
-        </div>
+        </GlassCard>
       )}
-    </div>
+    </GlassCard>
   );
 }

@@ -20,9 +20,426 @@
 }
 
 body {
-  background: var(--background);
+  background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+  background-attachment: fixed;
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Glassmorphic base styles */
+.glass-card {
+  backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 1rem;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.glass-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 32px 64px -12px rgba(0, 0, 0, 0.35);
+}
+
+.glass-button {
+  backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 0.75rem;
+  transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.glass-button:hover {
+  transform: scale(1.05);
+}
+
+.glass-button:focus {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Status indicator animations */
+.status-pulse {
+  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Shimmer loading animation */
+.shimmer {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200px 100%;
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200px 0; }
+  100% { background-position: calc(200px + 100%) 0; }
+}
+
+/* Enhanced hover animations */
+.hover-lift {
+  transition: all 200ms cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Floating animation for navigation */
+.float-animation {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-5px); }
+}
+
+/* Slide in animations for notifications */
+.slide-in-right {
+  animation: slideInRight 300ms ease-out;
+}
+
+@keyframes slideInRight {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Fade out animation */
+.fade-out {
+  animation: fadeOut 300ms ease-out forwards;
+}
+
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+}
+
+/* Toast progress bar animation */
+@keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* Enhanced visual hierarchy */
+.text-hierarchy-1 {
+  @apply text-3xl font-bold text-gray-900 leading-tight;
+}
+
+.text-hierarchy-2 {
+  @apply text-2xl font-semibold text-gray-900 leading-snug;
+}
+
+.text-hierarchy-3 {
+  @apply text-xl font-medium text-gray-800 leading-relaxed;
+}
+
+.text-hierarchy-4 {
+  @apply text-lg font-medium text-gray-700;
+}
+
+.text-hierarchy-body {
+  @apply text-base text-gray-600 leading-relaxed;
+}
+
+.text-hierarchy-caption {
+  @apply text-sm text-gray-500 leading-normal;
+}
+
+/* Enhanced spacing system */
+.space-section {
+  @apply space-y-8;
+}
+
+.space-component {
+  @apply space-y-6;
+}
+
+.space-element {
+  @apply space-y-4;
+}
+
+.space-tight {
+  @apply space-y-2;
+}
+
+/* Enhanced glassmorphic effects */
+.glass-ultra {
+  backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 25px 50px -12px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+.glass-subtle {
+  backdrop-filter: blur(8px);
+  background: rgba(255, 255, 255, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced hover states */
+.hover-lift {
+  transition: all 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
+}
+
+.hover-lift:hover {
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 
+    0 32px 64px -12px rgba(0, 0, 0, 0.35),
+    0 0 20px rgba(59, 130, 246, 0.1);
+}
+
+/* Responsive design enhancements */
+@media (max-width: 640px) {
+  .glass-card {
+    padding: 1rem;
+    margin: 0.5rem;
+  }
+  
+  .hover-lift:hover {
+    transform: none; /* Disable hover effects on mobile */
+  }
+}
+
+@media (max-width: 768px) {
+  .text-hierarchy-1 {
+    @apply text-2xl;
+  }
+  
+  .text-hierarchy-2 {
+    @apply text-xl;
+  }
+}
+
+/* Touch device optimizations */
+@media (hover: none) and (pointer: coarse) {
+  .hover-lift:hover {
+    transform: none;
+  }
+  
+  .glass-button:hover {
+    transform: none;
+  }
+  
+  /* Larger touch targets */
+  button, [role="button"] {
+    min-height: 48px;
+    min-width: 48px;
+  }
+}
+
+/* Enhanced focus states */
+.focus-ring-enhanced {
+  transition: all 0.2s ease-out;
+}
+
+.focus-ring-enhanced:focus {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+  box-shadow: 
+    0 0 0 3px rgba(59, 130, 246, 0.1),
+    0 10px 25px -5px rgba(0, 0, 0, 0.1);
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.0) 0%,
+    rgba(255, 255, 255, 0.2) 20%,
+    rgba(255, 255, 255, 0.5) 60%,
+    rgba(255, 255, 255, 0.0) 100%
+  );
+  background-size: 200px 100%;
+  animation: shimmer 2s infinite;
+}
+
+/* Scrollbar hiding for mobile navigation */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Accessibility enhancements */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Focus management */
+.focus-trap {
+  position: relative;
+}
+
+.focus-trap:focus-within {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .glass-card {
+    border-width: 2px;
+    border-color: currentColor;
+    background: rgba(255, 255, 255, 0.95);
+  }
+  
+  .glass-button {
+    border-width: 2px;
+    border-color: currentColor;
+  }
+  
+  /* Ensure text has sufficient contrast */
+  .text-gray-600 {
+    color: #374151; /* Darker gray for better contrast */
+  }
+  
+  .text-gray-500 {
+    color: #4b5563; /* Darker gray for better contrast */
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  .animate-pulse,
+  .animate-spin,
+  .animate-bounce {
+    animation: none !important;
+  }
+  
+  /* Disable glassmorphic effects for reduced motion */
+  .glass-card {
+    backdrop-filter: none !important;
+    background: rgba(255, 255, 255, 0.95) !important;
+  }
+}
+
+/* Performance optimizations */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* Low-performance device optimizations */
+@media (max-resolution: 1dppx) {
+  .glass-card {
+    backdrop-filter: none;
+    background: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  }
+  
+  .animate-pulse {
+    animation: none;
+  }
+}
+
+/* Memory-efficient animations */
+.efficient-fade {
+  opacity: 0;
+  transition: opacity 0.2s ease-out;
+}
+
+.efficient-fade.visible {
+  opacity: 1;
+}
+
+.efficient-scale {
+  transform: scale(1);
+  transition: transform 0.2s ease-out;
+}
+
+.efficient-scale:hover {
+  transform: scale(1.02);
+}
+
+/* Focus indicators for keyboard navigation */
+*:focus {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Skip to main content link */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: #3b82f6;
+  color: white;
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  z-index: 1000;
+}
+
+.skip-link:focus {
+  top: 6px;
+}
+
+/* Ensure minimum touch target sizes */
+button, 
+[role="button"], 
+input[type="button"], 
+input[type="submit"], 
+input[type="reset"] {
+  min-height: 44px;
+  min-width: 44px;
+}
+
+/* Color contrast helpers */
+.text-high-contrast {
+  color: #111827; /* Ensures AAA contrast on white */
+}
+
+.bg-high-contrast {
+  background-color: #ffffff;
+  color: #111827;
 }
 
 /* Custom scrollbar for better UX */
@@ -91,6 +508,7 @@ html {
 /* Better tab transitions */
 .tab-content {
   animation: fadeIn 0.3s ease-in-out;
+  min-height: 400px; /* Prevent layout shift */
 }
 
 @keyframes fadeIn {
@@ -102,4 +520,21 @@ html {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+/* Consistent section spacing */
+.space-section > * + * {
+  margin-top: 2rem; /* 32px */
+}
+
+.space-component > * + * {
+  margin-top: 1.5rem; /* 24px */
+}
+
+.space-element > * + * {
+  margin-top: 1rem; /* 16px */
+}
+
+.space-tight > * + * {
+  margin-top: 0.5rem; /* 8px */
 }
